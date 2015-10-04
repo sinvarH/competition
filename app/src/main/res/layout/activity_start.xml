@@ -1,0 +1,21 @@
+<android.support.v4.widget.DrawerLayout
+    android:id="@+id/dl_main_drawer"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <!-- 你的内容布局-->
+    <include layout="@layout/navigation_content"/>
+
+    <FrameLayout
+        android:background="@android:color/white"
+        android:id="@+id/leftMenu"
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start">
+        <!-- letf_menufragment为了开发时更直观，将其layou_gravity写在左-->
+    </FrameLayout>
+
+</android.support.v4.widget.DrawerLayout>
