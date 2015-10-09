@@ -3,18 +3,10 @@ package sinvar.meizhuo.com.at.ui;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
-
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-
-import org.json.JSONObject;
+import android.os.Handler;
 
 import sinvar.meizhuo.com.at.R;
-import sinvar.meizhuo.com.at.gsonvolleyandokhttp.VolleySingleQueue;
 import sinvar.meizhuo.com.at.utils.ActivitySwitcher;
-import sinvar.meizhuo.com.at.utils.ApiAdress;
 import sinvar.meizhuo.com.at.utils.NetWorkUtil;
 
 /**
@@ -55,23 +47,11 @@ public class LoadActivity extends BaseActivity
 
     protected void init()
     {
-        JsonObjectRequest jsonObjectRequest  = new JsonObjectRequest(ApiAdress.getList(1), null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-
-                    Log.e("fuck", ApiAdress.getList(1));
-                    Log.e("fuck", response.toString());
-
-
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                ActivitySwitcher.pushDefault(LoadActivity.this, StartActivity.class);
+                LoadActivity.this.finish();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        }) ;
-        VolleySingleQueue.addRequest(jsonObjectRequest);
-
-        ActivitySwitcher.pushDefault(LoadActivity.this, StartActivity.class);
+        }, 1000);
     }
 }

@@ -27,6 +27,11 @@ public class VideoListAdapter extends BaseAdapter {
     private List<ViedoAnimeInfo.AnimeEntity> animeEntity;
     private ViewHolder holder;
 
+    public void clearData()
+    {
+        animeEntity.clear();
+    }
+
     public void setAnimeEntity(List<ViedoAnimeInfo.AnimeEntity> animeEntity) {
         this.animeEntity = animeEntity;
     }
@@ -36,7 +41,12 @@ public class VideoListAdapter extends BaseAdapter {
         this.animeEntity = new ArrayList<>() ;
     }
 
+    public List<ViedoAnimeInfo.AnimeEntity> getAnimeEntity() {
+        return animeEntity;
+    }
+
     @Override
+
     public int getCount() {
         return animeEntity.size();
     }
@@ -48,7 +58,7 @@ public class VideoListAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return position;
+            return position ;
     }
 
     @Override

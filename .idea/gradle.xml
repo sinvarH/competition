@@ -12,6 +12,8 @@
             <option value="$PROJECT_DIR$/WaterDropListView" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/loadmore" />
+            <option value="$PROJECT_DIR$/vitamio" />
+            <option value="$PROJECT_DIR$/vitamio-sample" />
           </set>
         </option>
       </GradleProjectSettings>

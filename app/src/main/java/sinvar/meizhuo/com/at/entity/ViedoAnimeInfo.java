@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by sinvar on 2015/10/2.
  */
-public class ViedoAnimeInfo {
+public class ViedoAnimeInfo  {
 
     @Override
     public String toString() {

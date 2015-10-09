@@ -1,1 +1,1 @@
-include ':app', 'WaterDropListView', 'loadmore'
+include ':app', 'WaterDropListView', 'loadmore', ':vitamio-sample', ':vitamio'

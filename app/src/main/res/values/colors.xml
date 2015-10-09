@@ -12,4 +12,7 @@
     <!-- drop down list footer font color -->
     <color name="drop_down_list_footer_font_color">#000000</color>
 
+    <color name="lerf_listview">#272727</color>
+
+    <color name="text_color">#FFFF</color>
 </resources>
