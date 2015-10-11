@@ -13,9 +13,8 @@ public class ApiAdress {
     private static final String ANIMATION_DETAIL_URL = "http://i.animetaste.net/api/animelist_v4/?api_key=%s&timestamp=%d&vid=%d&access_token=%s";
     private static final String CATEGORY_REQUEST_URL = "http://i.animetaste.net/api/animelist_v4/?api_key=%s&timestamp=%d&page=%d&category=%d&limit=%d&access_token=%s";
 
-    private static final String API_KEY = "android";
-    private static final String API_SECRET = "7763079ba6abf342a99ab5a1dfa87ba8";
-
+    private static final String API_KEY = "android" ;
+    private static final String API_SECRET = "7763079ba6abf342a99ab5a1dfa87ba8" ;
 
     public static String getInitData(int animeCount,int featureCount,int advertiseCount){
         long timeStamp = System.currentTimeMillis()/1000L;

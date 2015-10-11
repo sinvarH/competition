@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
@@ -48,14 +47,17 @@ public class StartActivity extends BaseActivity implements BGARefreshLayout.BGAR
     @InjectView(R.id.leftMenu)
     FrameLayout leftMenu;
     @InjectView(R.id.dl_main_drawer)
-    DrawerLayout dlMainDrawer;
+    DrawerLayout drawerLayout;
 
     private ActionBarDrawerToggle mDrawerToggle;
     private LeftMenuFragment leftMenuFragment;
     private ViedoAnimeInfo viedoAnimeInfo;
-    private Integer currentPage ;
-    private VideoListAdapter videoListAdapter ;
+    public static VideoListAdapter videoListAdapter ;
+    private ListView letfMenuListView ;
 
+    private String nextPageUrl ;
+    private int currentPage ;
+    private int type ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -63,85 +65,135 @@ public class StartActivity extends BaseActivity implements BGARefreshLayout.BGAR
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         ButterKnife.inject(this);
-        videoListAdapter = new VideoListAdapter(StartActivity.this);
+
+        videoListAdapter = new VideoListAdapter(StartActivity.this) ;
+        list.setAdapter(videoListAdapter);
+
         initLayout();
-        getData();
+        getFirstPageData(ApiAdress.getList(currentPage));
     }
 
     private void initLayout()
     {
+        currentPage = 1 ;
+        //4是调用api的getlist
+        type = 4  ;
+
         toolbar.setTitle("AT");
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //创建返回键，并实现打开关/闭监听
-        mDrawerToggle = new ActionBarDrawerToggle(this, dlMainDrawer, toolbar, 0, 0) {
+        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0)
+        {
             @Override
-            public void onDrawerOpened(View drawerView) {
+            public void onDrawerOpened(View drawerView)
+            {
                 super.onDrawerOpened(drawerView);
+                letfMenuListView = leftMenuFragment.getMenuList() ;
+
+                letfMenuListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                    {
+                        switch (position)
+                        {
+                            case (0):
+                                type = 0 ;
+                                videoListAdapter.clearData();
+                                currentPage = 1 ;
+                                getFirstPageData(ApiAdress.getCategory(0, currentPage, 10));
+                                drawerLayout.closeDrawers();
+                                break;
+                            case (1):
+                                type = 1 ;
+                                videoListAdapter.clearData();
+                                currentPage = 1 ;
+                                getFirstPageData(ApiAdress.getCategory(1, currentPage, 10));
+                                drawerLayout.closeDrawers();
+                                break;
+                            case (2):
+                                type = 2 ;
+                                videoListAdapter.clearData();
+                                currentPage = 1 ;
+                                getFirstPageData(ApiAdress.getCategory(2,currentPage, 10));
+                                drawerLayout.closeDrawers();
+                                break;
+                            case (3):
+                                type = 3 ;
+                                videoListAdapter.clearData();
+                                currentPage = 1 ;
+                                getFirstPageData(ApiAdress.getCategory(3, currentPage, 10));
+                                drawerLayout.closeDrawers();
+                                break;
+                        }
+                    }
+                });
             }
 
             @Override
-            public void onDrawerClosed(View drawerView) {
+            public void onDrawerClosed(View drawerView)
+            {
                 super.onDrawerClosed(drawerView);
             }
         };
-
         mDrawerToggle.syncState();
-        dlMainDrawer.setDrawerListener(mDrawerToggle);
+        drawerLayout.setDrawerListener(mDrawerToggle);
 
         leftMenuFragment = new LeftMenuFragment();
+        leftMenuFragment.setVideoListAdapter(videoListAdapter);
         getFragmentManager().beginTransaction().add(R.id.leftMenu, leftMenuFragment).commit();
 
         initRefreshLayout();
 
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                viedoAnimeInfo.setAnime(videoListAdapter.getAnimeEntity()) ;
-                Bundle bundle = new Bundle() ;
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                viedoAnimeInfo.setAnime(videoListAdapter.getAnimeEntity());
+                Bundle bundle = new Bundle();
 
-                ArrayList<String> list =new ArrayList<String>() ;
+                ArrayList<String> list = new ArrayList<String>();
                 list.add(viedoAnimeInfo.getAnime().get(position).getVideoSource().getSd());
                 list.add(viedoAnimeInfo.getAnime().get(position).getDetailPic());
-                list.add( viedoAnimeInfo.getAnime().get(position).getName());
+                list.add(viedoAnimeInfo.getAnime().get(position).getName());
                 list.add(viedoAnimeInfo.getAnime().get(position).getAuthor());
                 list.add(viedoAnimeInfo.getAnime().get(position).getBrief());
 
                 bundle.putString("videosource", viedoAnimeInfo.getAnime().get(position).getVideoSource().getSd());
-                bundle.putStringArrayList("data",list);
-                ActivitySwitcher.pushDefault(StartActivity.this, VideoDetailActivity.class,bundle);
+                bundle.putStringArrayList("data", list);
+                ActivitySwitcher.pushDefault(StartActivity.this, VideoDetailActivity.class, bundle);
             }
         });
+
     }
 
     /**
      * 来日叶良辰修复这段垃圾代码
      */
-    public void getData()
+    public void getFirstPageData(String url)
     {
-        currentPage =1 ;
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(ApiAdress.getList(currentPage), null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     String jsonString = response.getJSONObject("data").getJSONObject("list").getJSONArray("anime").
                             toString();
                     jsonString = "{\"anime\":" + jsonString + "}";
-                    Log.e("fuck", "{\"anime\":" + jsonString + "}");
-
                     Gson gson = new Gson();
                     viedoAnimeInfo = gson.fromJson(jsonString, ViedoAnimeInfo.class);
-                    Log.e("eee", viedoAnimeInfo.toString());
 
-                    list.setAdapter(videoListAdapter);
+                    List<ViedoAnimeInfo.AnimeEntity> animeEntity = videoListAdapter.getAnimeEntity();
+                    animeEntity.addAll(viedoAnimeInfo.getAnime());
                     videoListAdapter.setAnimeEntity(viedoAnimeInfo.getAnime());
                     videoListAdapter.notifyDataSetChanged();
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                } catch (JSONException e)
+                {
+                    e.printStackTrace() ;
                 }
-
             }
         }, new Response.ErrorListener() {
             @Override
@@ -167,36 +219,7 @@ public class StartActivity extends BaseActivity implements BGARefreshLayout.BGAR
     @Override
     public void onBGARefreshLayoutBeginLoadingMore()
     {
-        currentPage++ ;
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(ApiAdress.getList(currentPage), null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    String jsonString = response.getJSONObject("data").getJSONObject("list").getJSONArray("anime").
-                            toString();
-                    jsonString = "{\"anime\":" + jsonString + "}";
-
-                    Gson gson = new Gson();
-                    viedoAnimeInfo = gson.fromJson(jsonString, ViedoAnimeInfo.class) ;
-
-                    List<ViedoAnimeInfo.AnimeEntity> animeEntity = videoListAdapter.getAnimeEntity();
-                    animeEntity.addAll(viedoAnimeInfo.getAnime());
-                    videoListAdapter.setAnimeEntity(animeEntity);
-                    mRefreshLayout.endRefreshing();
-                    videoListAdapter.notifyDataSetChanged();
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        });
-        VolleySingleQueue.addRequest(jsonObjectRequest);
+        getNextPageData();
     }
 
     public void initRefreshLayout ()
@@ -251,15 +274,58 @@ public class StartActivity extends BaseActivity implements BGARefreshLayout.BGAR
         refreshViewHolder.setLoadMoreBackgroundColorRes(R.color.LoadBackground);
         // 设置整个加载更多控件的背景drawable资源id
         refreshViewHolder.setLoadMoreBackgroundDrawableRes(R.drawable.ic_action_name);
+    }
 
-        /*
-        // 设置下拉刷新控件的背景颜色资源id
-        refreshViewHolder.setRefreshViewBackgroundColorRes(refreshViewBackgroundColorRes);
-        // 设置下拉刷新控件的背景drawable资源id
-        refreshViewHolder.setRefreshViewBackgroundDrawableRes(refreshViewBackgroundDrawableRes);
-        // 设置自定义头部视图（也可以不用设置）     参数1：自定义头部视图（例如广告位）， 参数2：上拉加载更多是否可用
-        mRefreshLayout.setCustomHeaderView(mBanner, true);
-        // 可选配置  -------------END
-        */
+    public void getNextPageData()
+    {
+        currentPage++ ;
+        switch (type)
+        {
+            case (0) :
+                nextPageUrl = ApiAdress.getCategory(0,currentPage,10) ;
+                break;
+            case (1):
+                nextPageUrl = ApiAdress.getCategory(1,currentPage,10) ;
+                break;
+            case (2):
+                nextPageUrl = ApiAdress.getCategory(2,currentPage,10) ;
+                break;
+            case (3) :
+                nextPageUrl = ApiAdress.getCategory(3,currentPage,10) ;
+                break;
+            case (4):
+                nextPageUrl=ApiAdress.getList(currentPage) ;
+                break;
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(nextPageUrl, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    String jsonString = response.getJSONObject("data").getJSONObject("list").getJSONArray("anime").
+                            toString();
+                    jsonString = "{\"anime\":" + jsonString + "}";
+
+                    Gson gson = new Gson();
+                    viedoAnimeInfo = gson.fromJson(jsonString, ViedoAnimeInfo.class) ;
+
+                    List<ViedoAnimeInfo.AnimeEntity> animeEntity = videoListAdapter.getAnimeEntity();
+                    animeEntity.addAll(viedoAnimeInfo.getAnime());
+                    videoListAdapter.setAnimeEntity(animeEntity);
+                    //里面包含notifydatachange
+                    mRefreshLayout.endRefreshing();
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error)
+            {
+            }
+        });
+        VolleySingleQueue.addRequest(jsonObjectRequest);
     }
 }

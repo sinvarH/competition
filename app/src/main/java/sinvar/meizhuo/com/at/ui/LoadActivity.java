@@ -25,16 +25,20 @@ public class LoadActivity extends BaseActivity
             AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle("网络提示")
                     .setMessage("当前为非wifi环境") ;
             builder.setCancelable(false) ;
-            builder.setPositiveButton("继续", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton("继续", new DialogInterface.OnClickListener()
+            {
                 @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+                public void onClick(DialogInterface dialogInterface, int i)
+                {
                     dialogInterface.dismiss();
                     init();
                 }
             }) ;
-            builder.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton("退出", new DialogInterface.OnClickListener()
+            {
                 @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+                public void onClick(DialogInterface dialogInterface, int i)
+                {
                     finish();
                 }
             }) ;
