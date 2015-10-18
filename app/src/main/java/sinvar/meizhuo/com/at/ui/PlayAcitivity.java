@@ -26,6 +26,7 @@ public class PlayAcitivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (!LibsChecker.checkVitamioLibs(this))
             return;
         sourceUrl = getIntent().getStringExtra("videosource");
@@ -61,4 +62,5 @@ public class PlayAcitivity extends BaseActivity {
             }
         });
     }
+
 }

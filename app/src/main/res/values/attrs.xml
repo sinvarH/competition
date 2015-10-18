@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <array name="left_menu_icon">
+        <item>@drawable/ic_mv</item>
+        <item>@drawable/ic_ad</item>
+        <item>@drawable/ic_documentary_films</item>
+        <item>@drawable/ic_preview</item>
+    </array>
 </resources>

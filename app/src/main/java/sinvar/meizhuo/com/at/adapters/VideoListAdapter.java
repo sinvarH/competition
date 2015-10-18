@@ -64,20 +64,20 @@ public class VideoListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView != null) {
-            holder = (ViewHolder) convertView.getTag();
-        } else {
-            convertView = LayoutInflater.from(context).inflate(R.layout.video_item, null, false);
-            holder = new ViewHolder(convertView);
-            convertView.setTag(holder);
-        }
-
-        Picasso.with(context).load(animeEntity.get(position).getHomePic())
-                .placeholder(R.drawable.placeholder_thumb)
-                .error(R.drawable.placeholder_fail).into(holder.thumb);
-        holder.title.setText(animeEntity.get(position).getName());
-        holder.content.setText(animeEntity.get(position).getBrief());
-        return convertView;
+        holder = (ViewHolder) convertView.getTag();
+    } else {
+        convertView = LayoutInflater.from(context).inflate(R.layout.video_item, null, false);
+        holder = new ViewHolder(convertView);
+        convertView.setTag(holder);
     }
+
+    Picasso.with(context).load(animeEntity.get(position).getHomePic())
+            .placeholder(R.drawable.placeholder_thumb)
+    .error(R.drawable.placeholder_fail).into(holder.thumb);
+    holder.title.setText(animeEntity.get(position).getName());
+    holder.content.setText(animeEntity.get(position).getBrief());
+    return convertView;
+}
 
     /**
      * This class contains all butterknife-injected Views & Layouts from layout file 'video_item.xml'

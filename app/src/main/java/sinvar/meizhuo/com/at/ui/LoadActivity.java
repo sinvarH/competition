@@ -4,9 +4,16 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
+
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 
 import sinvar.meizhuo.com.at.R;
+import sinvar.meizhuo.com.at.gsonvolleyandokhttp.VolleySingleQueue;
 import sinvar.meizhuo.com.at.utils.ActivitySwitcher;
+import sinvar.meizhuo.com.at.utils.ApiAdress;
 import sinvar.meizhuo.com.at.utils.NetWorkUtil;
 
 /**
@@ -51,11 +58,25 @@ public class LoadActivity extends BaseActivity
 
     protected void init()
     {
-        new Handler().postDelayed(new Runnable() {
+        new Handler().postDelayed(new Runnable()
+        {
             public void run() {
                 ActivitySwitcher.pushDefault(LoadActivity.this, StartActivity.class);
                 LoadActivity.this.finish();
             }
         }, 1000);
+        StringRequest stringRequest= new StringRequest(ApiAdress.getDetail(1624), new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.e("eeeeeee",response) ;
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error)
+            {
+
+            }
+        }) ;
+        VolleySingleQueue.getInstance().addRequest(stringRequest) ;
     }
 }

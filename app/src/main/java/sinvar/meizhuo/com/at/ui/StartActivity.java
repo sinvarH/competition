@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
@@ -19,12 +20,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
 import cn.bingoogolapple.refreshlayout.BGARefreshViewHolder;
+import cn.lightsky.infiniteindicator.InfiniteIndicatorLayout;
+import cn.lightsky.infiniteindicator.slideview.BaseSliderView;
+import cn.lightsky.infiniteindicator.slideview.DefaultSliderView;
 import sinvar.meizhuo.com.at.R;
 import sinvar.meizhuo.com.at.adapters.VideoListAdapter;
 import sinvar.meizhuo.com.at.entity.ViedoAnimeInfo;
@@ -36,7 +41,8 @@ import sinvar.meizhuo.com.at.utils.ApiAdress;
 /**
  * Created by sinvar on 2015/10/2.
  */
-public class StartActivity extends BaseActivity implements BGARefreshLayout.BGARefreshLayoutDelegate{
+public class StartActivity extends BaseActivity implements BGARefreshLayout.BGARefreshLayoutDelegate
+{
 
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -48,12 +54,15 @@ public class StartActivity extends BaseActivity implements BGARefreshLayout.BGAR
     FrameLayout leftMenu;
     @InjectView(R.id.dl_main_drawer)
     DrawerLayout drawerLayout;
+//    @InjectView(R.id.indicator_default_circle)
+//    InfiniteIndicatorLayout  mDefaultIndicator ;
 
     private ActionBarDrawerToggle mDrawerToggle;
     private LeftMenuFragment leftMenuFragment;
     private ViedoAnimeInfo viedoAnimeInfo;
     public static VideoListAdapter videoListAdapter ;
     private ListView letfMenuListView ;
+    private  InfiniteIndicatorLayout mDefaultIndicator ;
 
     private String nextPageUrl ;
     private int currentPage ;
@@ -66,7 +75,13 @@ public class StartActivity extends BaseActivity implements BGARefreshLayout.BGAR
         setContentView(R.layout.activity_start);
         ButterKnife.inject(this);
 
+        //设置Indicator的属性，这样有个坑，需要有viewgrop参数，调用三个参数的
+        mDefaultIndicator = (InfiniteIndicatorLayout)getLayoutInflater().inflate(R.layout.listview_header,list,false) ;
+        setIndicator();
+
+        //设置listview，注意addheaderview在setadapter之前
         videoListAdapter = new VideoListAdapter(StartActivity.this) ;
+        list.addHeaderView(mDefaultIndicator);
         list.setAdapter(videoListAdapter);
 
         initLayout();
@@ -78,8 +93,8 @@ public class StartActivity extends BaseActivity implements BGARefreshLayout.BGAR
         currentPage = 1 ;
         //4是调用api的getlist
         type = 4  ;
-
-        toolbar.setTitle("AT");
+        toolbar.setTitle("");
+        toolbar.setLogo(R.drawable.icon);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -147,20 +162,21 @@ public class StartActivity extends BaseActivity implements BGARefreshLayout.BGAR
 
         initRefreshLayout();
 
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 viedoAnimeInfo.setAnime(videoListAdapter.getAnimeEntity());
                 Bundle bundle = new Bundle();
 
+                //这里为了使用添加了header而减一
+                position=position-1;
                 ArrayList<String> list = new ArrayList<String>();
                 list.add(viedoAnimeInfo.getAnime().get(position).getVideoSource().getSd());
                 list.add(viedoAnimeInfo.getAnime().get(position).getDetailPic());
                 list.add(viedoAnimeInfo.getAnime().get(position).getName());
                 list.add(viedoAnimeInfo.getAnime().get(position).getAuthor());
                 list.add(viedoAnimeInfo.getAnime().get(position).getBrief());
+                list.add(viedoAnimeInfo.getAnime().get(position).getId());
 
                 bundle.putString("videosource", viedoAnimeInfo.getAnime().get(position).getVideoSource().getSd());
                 bundle.putStringArrayList("data", list);
@@ -182,6 +198,8 @@ public class StartActivity extends BaseActivity implements BGARefreshLayout.BGAR
                     String jsonString = response.getJSONObject("data").getJSONObject("list").getJSONArray("anime").
                             toString();
                     jsonString = "{\"anime\":" + jsonString + "}";
+                    Log.e("fuckyou",jsonString) ;
+
                     Gson gson = new Gson();
                     viedoAnimeInfo = gson.fromJson(jsonString, ViedoAnimeInfo.class);
 
@@ -203,6 +221,7 @@ public class StartActivity extends BaseActivity implements BGARefreshLayout.BGAR
         });
         VolleySingleQueue.addRequest(jsonObjectRequest);
     }
+
 
     /**
      * 下拉刷新
@@ -301,6 +320,7 @@ public class StartActivity extends BaseActivity implements BGARefreshLayout.BGAR
             @Override
             public void onResponse(JSONObject response) {
                 try {
+
                     String jsonString = response.getJSONObject("data").getJSONObject("list").getJSONArray("anime").
                             toString();
                     jsonString = "{\"anime\":" + jsonString + "}";
@@ -312,11 +332,12 @@ public class StartActivity extends BaseActivity implements BGARefreshLayout.BGAR
                     animeEntity.addAll(viedoAnimeInfo.getAnime());
                     videoListAdapter.setAnimeEntity(animeEntity);
                     //里面包含notifydatachange
-                    mRefreshLayout.endRefreshing();
-
 
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    mRefreshLayout.endRefreshing();
+                }finally {
+                    mRefreshLayout.endRefreshing();
                 }
 
             }
@@ -324,8 +345,54 @@ public class StartActivity extends BaseActivity implements BGARefreshLayout.BGAR
             @Override
             public void onErrorResponse(VolleyError error)
             {
+                mRefreshLayout.endRefreshing();
             }
         });
         VolleySingleQueue.addRequest(jsonObjectRequest);
+    }
+
+    /**
+     * 轮播设置
+     */
+    private void setIndicator ()
+    {
+        HashMap<String,String> url_maps = new HashMap<String, String>();
+        url_maps = new HashMap<String, String>();
+        url_maps.put("Page A", "http://ww3.sinaimg.cn/large/0066P23Wjw1ex549ry7xsj30hs07sq45.jpg");
+        url_maps.put("Page B", "http://ww1.sinaimg.cn/large/0066P23Wjw1eww0y71jg4j30hs0buwfy.jpg");
+        url_maps.put("Page C", "http://ww1.sinaimg.cn/large/0066P23Wjw1eww0ikuu0bj30hs07s3z8.jpg");
+        url_maps.put("Page D", "http://ww4.sinaimg.cn/large/0066P23Wjw1ew6m6mgspij30hs07smxw.jpg");
+
+        for(String name : url_maps.keySet()){
+            DefaultSliderView textSliderView = new DefaultSliderView(this);
+            textSliderView
+                    .image(url_maps.get(name))
+                    .setScaleType(BaseSliderView.ScaleType.Fit)
+                    .showImageResForEmpty(R.drawable.placeholder_fail)
+                    .showImageResForError(R.drawable.placeholder_thumb)
+                    .setOnSliderClickListener(new BaseSliderView.OnSliderClickListener() {
+                        @Override
+                        public void onSliderClick(BaseSliderView baseSliderView) {
+
+                        }
+                    });
+            textSliderView.getBundle()
+                    .putString("extra",name);
+            mDefaultIndicator.addSlider(textSliderView);
+        }
+        mDefaultIndicator.setIndicatorPosition(InfiniteIndicatorLayout.IndicatorPosition.Center_Bottom);
+        mDefaultIndicator.startAutoScroll();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mDefaultIndicator.stopAutoScroll();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mDefaultIndicator.startAutoScroll();
     }
 }

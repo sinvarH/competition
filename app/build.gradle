@@ -18,6 +18,11 @@ android {
         }
     }
     sourceSets { main { res.srcDirs = ['src/main/res', 'src/main/res/anim'] } }
+
+    packagingOptions{
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
 }
 
 dependencies {
@@ -33,4 +38,6 @@ dependencies {
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'cn.bingoogolapple:bga-refreshlayout:1.0.0@aar'
     compile project(':vitamio')
+    //轮播控件
+    compile 'cn.lightsky.infiniteindicator:library:1.0.3'
 }

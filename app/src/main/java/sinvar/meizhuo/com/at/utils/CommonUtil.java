@@ -35,4 +35,15 @@ public class CommonUtil {
         m.appendTail(sb);
         return sb.toString().replace("\\r\\n\\r\\n","").replace("\\r\\n \\r\\n","");
     }
+
+    /**
+     * 根据手机分辨率从dp转成px
+     *
+     * @param dpValue
+     * @return
+     */
+    public static int dip2px(float dpValue) {
+        final float scale = MyApp.getContext().getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
 }
