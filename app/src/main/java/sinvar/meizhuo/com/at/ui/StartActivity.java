@@ -76,7 +76,7 @@ public class StartActivity extends BaseActivity implements BGARefreshLayout.BGAR
         ButterKnife.inject(this);
 
         //设置Indicator的属性，这样有个坑，需要有viewgrop参数，调用三个参数的
-        mDefaultIndicator = (InfiniteIndicatorLayout)getLayoutInflater().inflate(R.layout.listview_header,list,false) ;
+        mDefaultIndicator =(InfiniteIndicatorLayout) getLayoutInflater().inflate(R.layout.listview_header,list,false) ;
         setIndicator();
 
         //设置listview，注意addheaderview在setadapter之前
@@ -387,7 +387,7 @@ public class StartActivity extends BaseActivity implements BGARefreshLayout.BGAR
     @Override
     protected void onPause() {
         super.onPause();
-        mDefaultIndicator.stopAutoScroll();
+       mDefaultIndicator.stopAutoScroll();
     }
 
     @Override
